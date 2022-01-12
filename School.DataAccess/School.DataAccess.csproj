@@ -56,9 +56,11 @@
     <Compile Include="Model\OnlineCourse.cs" />
     <Compile Include="Model\OnsiteCourse.cs" />
     <Compile Include="Model\Person.cs" />
+    <Compile Include="Model\StudentGradePartial.cs" />
     <Compile Include="SchoolDb.cs" />
     <Compile Include="Model\StudentGrade.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModel\CoursesComplex.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

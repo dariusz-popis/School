@@ -1,0 +1,34 @@
+﻿@model IEnumerable<School.DataAccess.Model.StudentGrade>
+@{
+    ViewBag.Title = "Update Student Grade";
+}
+
+<h2>Update Student Grade</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+<table class="table table-condensed">
+    <tr>
+        <th>@Html.DisplayNameFor(model => model.Course.Title)</th>
+        <th>Full Name</th>
+        <th>@Html.DisplayNameFor(model => model.Grade)</th>
+        <th>@Html.DisplayNameFor(model => model.HasToUpdate)</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        @Html.HiddenFor(m => item.EnrollmentID)
+        <tr>
+            <td>@item.Course.Title</td>
+            <td>@item.Person.FirstName @item.Person.LastName</td>
+            <td>@item.Grade</td>
+            <td>@Html.CheckBoxFor(m => item.HasToUpdate)</td>
+        </tr>
+    }
+</table>
+    <div class="form-group">
+        <div class="col-md-offset-10 col-md-10">
+            <input type="submit" value="Save" class="btn btn-info" />
+        </div>
+    </div>
+}
