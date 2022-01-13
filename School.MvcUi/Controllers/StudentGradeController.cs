@@ -12,14 +12,12 @@ namespace School.MvcUi.Controllers
     {
         private SchoolDb db = new SchoolDb();
 
-        // GET: StudenGrade
         public ActionResult Index()
         {
             var studentGrades = db.StudentGrades.Include(s => s.Course).Include(s => s.Person);
             return View(studentGrades.ToList());
         }
 
-        // GET: StudenGrade/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -34,17 +32,13 @@ namespace School.MvcUi.Controllers
             return View(studenGrade);
         }
 
-        // GET: StudenGrade/Create
         public ActionResult Create()
         {
-            ViewBag.CourseID = new SelectList(db.Courses, "CourseID", "Title");
-            ViewBag.StudentID = new SelectList(db.People, "PersonID", "LastName");
+            ViewBag.CourseID = new SelectList(db.Courses.OrderBy(c=>c.Title), "CourseID", "Title");
+            ViewBag.StudentID = new SelectList(db.People, "PersonID", "LastName").OrderBy(c => c.Text);
             return View();
         }
 
-        // POST: StudenGrade/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "EnrollmentID,CourseID,StudentID,Grade")] StudentGrade studenGrade)
@@ -61,7 +55,6 @@ namespace School.MvcUi.Controllers
             return View(studenGrade);
         }
 
-        // GET: StudenGrade/Edit/5
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -78,9 +71,6 @@ namespace School.MvcUi.Controllers
             return View(studenGrade);
         }
 
-        // POST: StudenGrade/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "EnrollmentID,CourseID,StudentID,Grade")] StudentGrade studenGrade)
@@ -106,23 +96,20 @@ namespace School.MvcUi.Controllers
             return View(studentGrades.ToList());
         }
 
-        // POST: StudenGrade/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Update(IEnumerable<StudentGrade> studenGrade)
+        public ActionResult Update(FormCollection form)
         {
-            if (ModelState.IsValid)
+            var result = new List<dynamic>();
+            for (int i = 1; i < form.Count; i += 2)
             {
-                db.Entry(studenGrade).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                result.Add(new { EnrolmentId = form[form.AllKeys[i]], HasToBeChecked = form[form.AllKeys[i + 1]].StartsWith("true"), HasToBeCheckedState = form[form.AllKeys[i + 1]] });
             }
-            return View(studenGrade);
+
+            return RedirectToAction(nameof(Update));
         }
 
-        // GET: StudenGrade/Delete/5
+        // GET: StudentGrade/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -137,7 +124,7 @@ namespace School.MvcUi.Controllers
             return View(studenGrade);
         }
 
-        // POST: StudenGrade/Delete/5
+        // POST: StudentGrade/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
@@ -153,6 +140,7 @@ namespace School.MvcUi.Controllers
             if (disposing)
             {
                 db.Dispose();
+                ,
             }
             base.Dispose(disposing);
         }

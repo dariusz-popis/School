@@ -21,13 +21,21 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Student Grade", "Index", "StudentGrade")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                </ul>
-                @Html.Partial("_LoginPartial")
-            </div>
+                    <li>
+                        <button class="btn btn-group dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Student Grade
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">@Html.ActionLink("Student Grade Index", "Index", "StudentGrade")</a>
+                            <a class="dropdown-item" href="#">@Html.ActionLink("Student Grade Update", "Update", "StudentGrade")</a>
+                        </div>
+                    </li>
+            <li>@Html.ActionLink("About", "About", "Home")</li>
+            <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+            </ul>
+            @Html.Partial("_LoginPartial")
         </div>
+    </div>
     </div>
     <div class="container body-content">
         @RenderBody()

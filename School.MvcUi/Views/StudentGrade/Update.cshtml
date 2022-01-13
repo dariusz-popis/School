@@ -3,31 +3,35 @@
     ViewBag.Title = "Update Student Grade";
 }
 
-<h2>Update Student Grade</h2>
-
+<h2>Update Student Grade @Html.ActionLink("All courses", "Update", new { id = (string)null }, new { @class = "badge" })</h2>
+<br>
 @using (Html.BeginForm())
 {
-    @Html.AntiForgeryToken()
-<table class="table table-condensed">
-    <tr>
-        <th>@Html.DisplayNameFor(model => model.Course.Title)</th>
-        <th>Full Name</th>
-        <th>@Html.DisplayNameFor(model => model.Grade)</th>
-        <th>@Html.DisplayNameFor(model => model.HasToUpdate)</th>
-    </tr>
-    @foreach (var item in Model)
-    {
-        @Html.HiddenFor(m => item.EnrollmentID)
-        <tr>
-            <td>@item.Course.Title</td>
-            <td>@item.Person.FirstName @item.Person.LastName</td>
-            <td>@item.Grade</td>
-            <td>@Html.CheckBoxFor(m => item.HasToUpdate)</td>
-        </tr>
-    }
-</table>
     <div class="form-group">
-        <div class="col-md-offset-10 col-md-10">
+        <div class="col-md-offset-11">
+            <input type="submit" value="Save" class="btn btn-info" />
+        </div>
+    </div>
+    @Html.AntiForgeryToken()
+    <table class="table table-condensed table-striped">
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Course.Title)</th>
+            <th>Full Name</th>
+            <th>@Html.DisplayNameFor(model => model.Grade)</th>
+            <th>@Html.DisplayNameFor(model => model.HasToUpdate)</th>
+        </tr>
+        @foreach (var item in Model.OrderBy(m => m.Course.Title))
+        {
+            <tr>
+                <td>@Html.Hidden($"Id_{item.EnrollmentID}", item.EnrollmentID) @Html.ActionLink(item.Course.Title, "Update", new { id = item.Course.Title })</td>
+                <td>@item.Person.FirstName @item.Person.LastName </td>
+                <td>@item.Grade</td>
+                <td>@Html.CheckBox($"HasToUpdate_{item.EnrollmentID}", isChecked: item.Grade <= (decimal)2.5) (here ??)</td>
+            </tr>
+        }
+    </table>
+    <div class="form-group">
+        <div class="col-md-offset-11">
             <input type="submit" value="Save" class="btn btn-info" />
         </div>
     </div>
