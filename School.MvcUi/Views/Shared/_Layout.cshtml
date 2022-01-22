@@ -22,26 +22,32 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>
-                        <button class="btn btn-group dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <div class="nav navbar-brand" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="studentGradeLinks">Student Grade</div>
+                        <div id="studentGradeLinks">
+                            <div>@Html.ActionLink("Student Grade Index", "Index", "StudentGrade")</div>
+                            <div>@Html.ActionLink("Student Grade Update", "Update", "StudentGrade")</div>
+                        </div>
+                    </li>
+
+                    @*<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Student Grade
                         </button>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="#">@Html.ActionLink("Student Grade Index", "Index", "StudentGrade")</a>
                             <a class="dropdown-item" href="#">@Html.ActionLink("Student Grade Update", "Update", "StudentGrade")</a>
-                        </div>
-                    </li>
-            <li>@Html.ActionLink("About", "About", "Home")</li>
-            <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-            </ul>
-            @Html.Partial("_LoginPartial")
+                        </div>*@
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
         </div>
-    </div>
     </div>
     <div class="container body-content">
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            <p>&copy; @DateTime.Now.Year By Financial Team in a startup project</p>
         </footer>
     </div>
 

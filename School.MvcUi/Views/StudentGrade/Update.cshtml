@@ -13,6 +13,10 @@
         </div>
     </div>
     @Html.AntiForgeryToken()
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+        <input id="grade" name="grade" type="text" class="form-control" placeholder="2.5" data-toggle="tooltip" title="Input only decimal number!!!">
+    </div>
     <table class="table table-condensed table-striped">
         <tr>
             <th>@Html.DisplayNameFor(model => model.Course.Title)</th>
