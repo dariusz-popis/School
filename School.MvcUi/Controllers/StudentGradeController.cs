@@ -1,4 +1,5 @@
 ﻿using School.DataAccess;
+using School.DataAccess.Helpers;
 using School.DataAccess.Model;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -34,7 +35,7 @@ namespace School.MvcUi.Controllers
 
         public ActionResult Create()
         {
-            ViewBag.CourseID = new SelectList(db.Courses.OrderBy(c=>c.Title), "CourseID", "Title");
+            ViewBag.CourseID = new SelectList(db.Courses.OrderBy(c => c.Title), "CourseID", "Title");
             ViewBag.StudentID = new SelectList(db.People, "PersonID", "LastName").OrderBy(c => c.Text);
             return View();
         }
@@ -100,16 +101,23 @@ namespace School.MvcUi.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Update(FormCollection form)
         {
-            var result = new List<dynamic>();
-            for (int i = 1; i < form.Count; i += 2)
+            var gradesToUpdate = new List<IdValue<decimal>>();
+            if (!decimal.TryParse(form[form.AllKeys[1]], out decimal grade)) return View("Error");
+
+            for (int i = 2; i < form.Count; i += 2)
             {
-                result.Add(new { EnrolmentId = form[form.AllKeys[i]], HasToBeChecked = form[form.AllKeys[i + 1]].StartsWith("true"), HasToBeCheckedState = form[form.AllKeys[i + 1]] });
+                if(!form[form.AllKeys[i + 1]].StartsWith("true")) continue;
+
+                if (!int.TryParse(form[form.AllKeys[i]], out int id)) return View("Error");
+
+                gradesToUpdate.Add(new IdValue<decimal> { Id = id, Value = grade });
             }
+
+            if (gradesToUpdate.Count > 0) using (var repo = new StudentGradeRepository()) repo.SetGrades(gradesToUpdate);
 
             return RedirectToAction(nameof(Update));
         }
 
-        // GET: StudentGrade/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -124,7 +132,6 @@ namespace School.MvcUi.Controllers
             return View(studenGrade);
         }
 
-        // POST: StudentGrade/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
@@ -140,7 +147,6 @@ namespace School.MvcUi.Controllers
             if (disposing)
             {
                 db.Dispose();
-                ,
             }
             base.Dispose(disposing);
         }
