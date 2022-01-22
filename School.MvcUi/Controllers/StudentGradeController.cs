@@ -1,10 +1,14 @@
-﻿using School.DataAccess;
+﻿using log4net;
+using School.DataAccess;
+using School.DataAccess.Helpers;
 using School.DataAccess.Model;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
 
 namespace School.MvcUi.Controllers
 {
@@ -34,7 +38,7 @@ namespace School.MvcUi.Controllers
 
         public ActionResult Create()
         {
-            ViewBag.CourseID = new SelectList(db.Courses.OrderBy(c=>c.Title), "CourseID", "Title");
+            ViewBag.CourseID = new SelectList(db.Courses.OrderBy(c => c.Title), "CourseID", "Title");
             ViewBag.StudentID = new SelectList(db.People, "PersonID", "LastName").OrderBy(c => c.Text);
             return View();
         }
@@ -52,6 +56,7 @@ namespace School.MvcUi.Controllers
 
             ViewBag.CourseID = new SelectList(db.Courses, "CourseID", "Title", studenGrade.CourseID);
             ViewBag.StudentID = new SelectList(db.People, "PersonID", "LastName", studenGrade.StudentID);
+
             return View(studenGrade);
         }
 
@@ -86,30 +91,55 @@ namespace School.MvcUi.Controllers
             return View(studenGrade);
         }
 
-        public ActionResult Update(string id)
+        public ActionResult Update(string id, string inline)
         {
             var studentGrades = id == null ? db.StudentGrades.Include(s => s.Course).Include(s => s.Person)
                 : db.StudentGrades.Where(sg => sg.Course.Title == id)
                     .Include(s => s.Course)
                     .Include(s => s.Person);
 
-            return View(studentGrades.ToList());
+            ViewBag.TopStudent = studentGrades.OrderByDescending(s => s.Grade).ThenByDescending(s => s.Person.LastName).FirstOrDefault();
+
+            return inline == null ? View(studentGrades.ToList()) : View("UpdateInline", studentGrades.ToList());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Update(FormCollection form)
         {
-            var result = new List<dynamic>();
-            for (int i = 1; i < form.Count; i += 2)
+            var gradesToUpdate = new List<IdValue<decimal>>();
+
+            if (!decimal.TryParse(form[form.AllKeys[1]], out decimal grade)) return View("Error");
+
+            for (int i = 2; i < form.Count; i += 2)
             {
-                result.Add(new { EnrolmentId = form[form.AllKeys[i]], HasToBeChecked = form[form.AllKeys[i + 1]].StartsWith("true"), HasToBeCheckedState = form[form.AllKeys[i + 1]] });
+                if (!form[form.AllKeys[i + 1]].StartsWith("true")) continue;
+
+                if (!int.TryParse(form[form.AllKeys[i]], out int id)) return View("Error");
+
+                gradesToUpdate.Add(new IdValue<decimal> { Id = id, Value = grade });
+            }
+
+            if (gradesToUpdate.Count > 0)
+            {
+                using (var repo = new StudentGradeRepository()) repo.SetGrades(gradesToUpdate, User.Identity.Name);
+                Log.Warn($"Name: {User.Identity.Name} Id: {User.Identity.GetUserId()} Type: {User.Identity.AuthenticationType} Has been invoke SetGrades at: {DateTime.Now}");
             }
 
             return RedirectToAction(nameof(Update));
         }
 
-        // GET: StudentGrade/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult UpdateInline(StudentGrade studentGrade)
+        {
+            var gradesToUpdate = new List<IdValue<decimal>>();
+
+            Log.Warn($"Name: {User.Identity.Name} Id: {User.Identity.GetUserId()} Type: {User.Identity.AuthenticationType} Has been invoke SetGrades at: {DateTime.Now}");
+
+            return RedirectToAction(nameof(Update));
+        }
+
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -124,7 +154,6 @@ namespace School.MvcUi.Controllers
             return View(studenGrade);
         }
 
-        // POST: StudentGrade/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
@@ -140,7 +169,6 @@ namespace School.MvcUi.Controllers
             if (disposing)
             {
                 db.Dispose();
-                ,
             }
             base.Dispose(disposing);
         }
